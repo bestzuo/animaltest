@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>动物人格测试</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#FAF8F5;color:#333;display:flex;justify-content:center;align-items:center;min-height:100vh;}
+  .card{width:100%;max-width:380px;background:#FFF;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.05);padding:18px;position:relative;overflow:hidden;}
+  #bar{position:absolute;top:0;left:0;height:4px;background:#D49A6A;width:0%;transition:width 0.3s;}
+  #qArea{margin-top:10px;}
+  .q-title{font-size:18px;font-weight:bold;margin-bottom:8px;line-height:1.3;}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  .opt{padding:10px 8px;border:1px solid #E8E2D9;border-radius:8px;background:#FFF;font-size:14px;cursor:pointer;transition:all 0.2s;}
+  .opt:active{background:#F5F0EB;border-color:#D49A6A;}
+  #result{display:none;text-align:center;}
+  #result.show{display:block;}
+  /* 关键：真实图片引用，8种动物全覆盖 */
+  #animalImg{width:100px;height:100px;object-fit:contain;margin:0 auto 8px;display:block;}
+  #rName{font-size:20px;font-weight:bold;margin-top:8px;color:#D49A6A;}
+  #rTag{font-size:13px;color:#888;margin-top:4px;}
+  #rDesc{font-size:14px;color:#555;margin-top:8px;line-height:1.4;}
+  #dims{margin-top:10px;display:flex;flex-wrap:wrap;justify-content:center;gap:6px;}
+  .dim{background:#F5F0EB;padding:4px 8px;border-radius:12px;font-size:12px;color:#666;}
+  #radar{margin-top:10px;width:260px;height:260px;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div id="bar"></div>
+  <div id="quiz"><div id="qArea"></div></div>
+  <div id="result">
+	<img id="animalImg" src="" alt="动物">
+	<div id="rName"></div>
+	<div id="rTag"></div>
+	<div id="rDesc"></div>
+	<div id="dims"></div>
+	<canvas id="radar" width="260" height="260"></canvas>
+  </div>
+</div>
+<script>
+const qs=[
+  {q:"你周末最想怎么过？",o:["宅家休息","约朋友玩","出门探险","独处充电"],d:[6,0,2,7]},
+  {q:"遇到冲突你通常？",o:["退一步","讲道理","硬刚","冷处理"],d:[4,1,3,5]},
+  {q:"你的气质更像？",o:["温柔","机灵","高冷","霸气"],d:[4,1,3,6]},
+  {q:"最喜欢的环境？",o:["森林","城市","雪地","海洋"],d:[0,1,2,4]},
+  {q:"做事风格是？",o:["慢工细活","随性自由","目标明确","稳扎稳打"],d:[5,7,6,4]},
+  {q:"面对压力你会？",o:["吃东西","找人倾诉","直接面对","逃避拖延"],d:[0,5,3,2]}
+];
+// 8种动物，图片路径全部写全，和你的png一一对应
+const map=[
+  {name:"水獭",tag:"治愈可爱 · 岁月静好",desc:"温暖治愈，懂得享受生活，手里有贝壳心里不慌。",dims:["治愈","安稳","可爱","细腻","满足"],vals:[90,85,80,75,88],img:"otter.png"},
+  {name:"赤狐",tag:"机灵聪慧 · 社交达人",desc:"聪明机警，八面玲珑，总能找到最优解。",dims:["机敏","社交","灵活","好奇","独立"],vals:[85,90,88,80,82],img:"fox.png"},
+  {name:"雪鸮",tag:"高冷智慧 · 洞察者",desc:"冷静睿智，洞察一切，自带神秘气场。",dims:["高冷","智慧","洞察","独立","静谧"],vals:[80,88,90,85,78],img:"owl.png"},
+  {name:"灰狼",tag:"傲娇酷飒 · 团队核心",desc:"桀骜不驯，忠诚果敢，团队中的领导者。",dims:["傲娇","忠诚","团队","果断","坚韧"],vals:[75,80,85,95,88],img:"wolf.png"},
+  {name:"陆龟",tag:"稳重踏实 · 长寿智者",desc:"稳重踏实，内心坚韧，岁月静好。",dims:["稳重","耐心","坚韧","平和","可靠"],vals:[70,75,80,85,95],img:"turtle.png"},
+  {name:"野兔",tag:"活泼灵动 · 小太阳",desc:"活泼可爱，心地善良，充满生机。",dims:["活泼","善良","灵动","敏感","快乐"],vals:[88,85,80,90,82],img:"rabbit.png"},
+  {name:"狮子",tag:"自信霸气 · 掌控一切",desc:"自信霸气，天生领袖，气场全开。",dims:["气场","领导","自信","热情","保护"],vals:[95,88,85,90,86],img:"lion.png"},
+  {name:"蝴蝶",tag:"自由美丽 · 蜕变",desc:"美丽自由，不断蜕变，灵魂轻盈。",dims:["自由","美丽","蜕变","灵动","浪漫"],vals:[85,95,88,80,90],img:"butterfly.png"}
+];
+let i=0,scores=[0,0,0,0,0,0,0,0];
+function next(){
+  document.getElementById("bar").style.width=((i/qs.length)*100)+"%";
+  if(i>=qs.length){showResult();return;}
+  const q=qs[i];
+  document.getElementById("qArea").innerHTML=`<div class="q-title">Q${i+1}. ${q.q}</div><div class="opts">${q.o.map((t,k)=>`<button class="opt" onclick="pick(${k})">${t}</button>`).join("")}</div>`;
+}
+function pick(k){scores[qs[i].d[k]]++;i++;next();}
+function showResult(){
+  document.getElementById("quiz").style.display="none";
+  let max=0,idx=0;for(let j=0;j<8;j++)if(scores[j]>max){max=scores[j];idx=j;}
+  if(max<=2 && scores[6]+scores[7]>max){idx=scores[6]>scores[7]?6:7;}
+  const r=map[idx];
+  document.getElementById("animalImg").src=r.img;
+  document.getElementById("animalImg").alt=r.name;
+  document.getElementById("rName").textContent=r.name;
+  document.getElementById("rTag").textContent=r.tag;
+  document.getElementById("rDesc").textContent=r.desc;
+  document.getElementById("dims").innerHTML=r.dims.map(d=>`<span class="dim">${d}</span>`).join("");
+  drawRadar(r);
+  document.getElementById("result").classList.add("show");
+  document.getElementById("bar").style.width="100%";
+}
+function drawRadar(r){
+  const c=document.getElementById("radar"),ctx=c.getContext("2d");
+  const cx=130,cy=130,rad=90,n=r.vals.length;
+  ctx.clearRect(0,0,260,260);
+  for(let g=1;g<=5;g++){ctx.beginPath();for(let j=0;j<n;j++){const a=Math.PI*2*j/n-Math.PI/2,rr=rad*g/5;ctx.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr);}ctx.closePath();ctx.strokeStyle="#E8E2D9";ctx.stroke();}
+  for(let j=0;j<n;j++){const a=Math.PI*2*j/n-Math.PI/2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*rad,cy+Math.sin(a)*rad);ctx.strokeStyle="#E8E2D9";ctx.stroke();}
+  ctx.beginPath();r.vals.forEach((v,j)=>{const a=Math.PI*2*j/n-Math.PI/2,rr=rad*v/100;ctx.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr);});ctx.closePath();ctx.fillStyle="rgba(212,154,106,0.35)";ctx.fill();ctx.strokeStyle="#D49A6A";ctx.lineWidth=2;ctx.stroke();
+  ctx.fillStyle="#666";ctx.font="11px sans-serif";
+  r.dims.forEach((d,j)=>{const a=Math.PI*2*j/n-Math.PI/2,lx=cx+Math.cos(a)*(rad+15),ly=cy+Math.sin(a)*(rad+15);ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(d,lx,ly);});
+}
+next();
+</script>
+</body>
+</html>
