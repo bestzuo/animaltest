@@ -2,97 +2,150 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>动物人格测试</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8动物人格测试</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#FAF8F5;color:#333;display:flex;justify-content:center;align-items:center;min-height:100vh;}
-  .card{width:100%;max-width:380px;background:#FFF;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.05);padding:18px;position:relative;overflow:hidden;}
-  #bar{position:absolute;top:0;left:0;height:4px;background:#D49A6A;width:0%;transition:width 0.3s;}
-  #qArea{margin-top:10px;}
-  .q-title{font-size:18px;font-weight:bold;margin-bottom:8px;line-height:1.3;}
-  .opts{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-  .opt{padding:10px 8px;border:1px solid #E8E2D9;border-radius:8px;background:#FFF;font-size:14px;cursor:pointer;transition:all 0.2s;}
-  .opt:active{background:#F5F0EB;border-color:#D49A6A;}
-  #result{display:none;text-align:center;}
-  #result.show{display:block;}
-  /* 关键：真实图片引用，8种动物全覆盖 */
-  #animalImg{width:100px;height:100px;object-fit:contain;margin:0 auto 8px;display:block;}
-  #rName{font-size:20px;font-weight:bold;margin-top:8px;color:#D49A6A;}
-  #rTag{font-size:13px;color:#888;margin-top:4px;}
-  #rDesc{font-size:14px;color:#555;margin-top:8px;line-height:1.4;}
-  #dims{margin-top:10px;display:flex;flex-wrap:wrap;justify-content:center;gap:6px;}
-  .dim{background:#F5F0EB;padding:4px 8px;border-radius:12px;font-size:12px;color:#666;}
-  #radar{margin-top:10px;width:260px;height:260px;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#f7f9fc;color:#333;display:flex;justify-content:center;align-items:center;min-height:100vh;}
+  .container{width:100%;max-width:420px;background:#fff;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.05);overflow:hidden;position:relative;min-height:500px;}
+  .page{padding:30px 20px;text-align:center;display:none;}
+  .page.active{display:block;}
+  .cover-img{width:180px;height:180px;margin:0 auto 20px;border-radius:50%;background:#eef7ff;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+  .cover-img img{width:100%;height:100%;object-fit:cover;}
+  h1{font-size:24px;margin-bottom:10px;}
+  p.sub{font-size:16px;color:#666;line-height:1.6;}
+  .btn{display:block;width:80%;margin:20px auto 10px;padding:14px;border-radius:30px;background:#333;color:#fff;font-size:17px;border:none;cursor:pointer;}
+  .btn:active{opacity:.8;}
+  .question-box{text-align:left;}
+  .q-num{color:#999;font-size:14px;margin-bottom:8px;}
+  .q-text{font-size:20px;font-weight:bold;margin-bottom:25px;}
+  .opt{display:block;padding:15px;border:1px solid #eee;border-radius:12px;margin-bottom:12px;font-size:16px;cursor:pointer;background:#fafafa;}
+  .opt:active{background:#eee;}
+  .result-img{width:160px;height:160px;margin:0 auto 15px;border-radius:50%;overflow:hidden;}
+  .result-img img{width:100%;height:100%;object-fit:cover;}
+  .result-title{font-size:26px;font-weight:bold;margin-bottom:5px;}
+  .result-sub{font-size:15px;color:#888;margin-bottom:15px;}
+  .result-desc{font-size:15px;line-height:1.7;color:#444;margin-bottom:20px;text-align:left;background:#f9f9f9;padding:15px;border-radius:12px;}
+  .match{font-size:15px;color:#d35400;font-weight:bold;}
 </style>
 </head>
 <body>
-<div class="card">
-  <div id="bar"></div>
-  <div id="quiz"><div id="qArea"></div></div>
-  <div id="result">
-	<img id="animalImg" src="" alt="动物">
-	<div id="rName"></div>
-	<div id="rTag"></div>
-	<div id="rDesc"></div>
-	<div id="dims"></div>
-	<canvas id="radar" width="260" height="260"></canvas>
+<div class="container">
+  <!-- 封面 -->
+  <div class="page active" id="cover">
+    <div class="cover-img"><img src="./otter.png" alt="水獭"></div>
+    <h1>8动物人格测试</h1>
+    <p class="sub">狐狸 · 雪鸮 · 狼 · 兔子<br>乌龟 · 狮子 · 蝴蝶 · 水獭</p>
+    <button class="btn" onclick="showPage('q1')">开始测试</button>
+  </div>
+
+  <!-- 题目 -->
+  <div class="page question-box" id="q1">
+    <div class="q-num">第1题 / 8</div>
+    <div class="q-text">周末你最想怎么过？</div>
+    <div class="opt" onclick="ans('A')">宅家慢悠悠</div>
+    <div class="opt" onclick="ans('B')">约朋友热闹</div>
+    <div class="opt" onclick="ans('C')">独处或自由行</div>
+  </div>
+  <div class="page question-box" id="q2">
+    <div class="q-num">第2题 / 8</div>
+    <div class="q-text">社交里你的状态是？</div>
+    <div class="opt" onclick="ans('A')">慢热观察</div>
+    <div class="opt" onclick="ans('B')">主导话题</div>
+    <div class="opt" onclick="ans('C')">随性融入</div>
+  </div>
+  <div class="page question-box" id="q3">
+    <div class="q-num">第3题 / 8</div>
+    <div class="q-text">恋爱里你更看重？</div>
+    <div class="opt" onclick="ans('A')">长情安全感</div>
+    <div class="opt" onclick="ans('B')">强强吸引</div>
+    <div class="opt" onclick="ans('C')">自由治愈</div>
+  </div>
+  <div class="page question-box" id="q4">
+    <div class="q-num">第4题 / 8</div>
+    <div class="q-text">遇到冲突你通常？</div>
+    <div class="opt" onclick="ans('A')">退一步沉稳</div>
+    <div class="opt" onclick="ans('B')">直接面对</div>
+    <div class="opt" onclick="ans('C')">灵活化解</div>
+  </div>
+  <div class="page question-box" id="q5">
+    <div class="q-num">第5题 / 8</div>
+    <div class="q-text">别人常夸你什么？</div>
+    <div class="opt" onclick="ans('A')">靠谱稳重</div>
+    <div class="opt" onclick="ans('B')">聪明有趣</div>
+    <div class="opt" onclick="ans('C')">温柔治愈</div>
+  </div>
+  <div class="page question-box" id="q6">
+    <div class="q-num">第6题 / 8</div>
+    <div class="q-text">你内心的底色是？</div>
+    <div class="opt" onclick="ans('A')">深沉神秘</div>
+    <div class="opt" onclick="ans('B')">热烈霸气</div>
+    <div class="opt" onclick="ans('C')">轻盈快乐</div>
+  </div>
+  <div class="page question-box" id="q7">
+    <div class="q-num">第7题 / 8</div>
+    <div class="q-text">工作/学习风格？</div>
+    <div class="opt" onclick="ans('A')">稳扎稳打</div>
+    <div class="opt" onclick="ans('B')">冲劲领导</div>
+    <div class="opt" onclick="ans('C')">灵感多变</div>
+  </div>
+  <div class="page question-box" id="q8">
+    <div class="q-num">第8题 / 8</div>
+    <div class="q-text">最像你的小特质？</div>
+    <div class="opt" onclick="ans('A')">护短嘴硬</div>
+    <div class="opt" onclick="ans('B')">高冷洞察</div>
+    <div class="opt" onclick="ans('C')">吃货快乐</div>
+  </div>
+
+  <!-- 结果 -->
+  <div class="page" id="result">
+    <div id="result-card"></div>
+    <button class="btn" onclick="location.reload()">再测一次</button>
   </div>
 </div>
+
 <script>
-const qs=[
-  {q:"你周末最想怎么过？",o:["宅家休息","约朋友玩","出门探险","独处充电"],d:[6,0,2,7]},
-  {q:"遇到冲突你通常？",o:["退一步","讲道理","硬刚","冷处理"],d:[4,1,3,5]},
-  {q:"你的气质更像？",o:["温柔","机灵","高冷","霸气"],d:[4,1,3,6]},
-  {q:"最喜欢的环境？",o:["森林","城市","雪地","海洋"],d:[0,1,2,4]},
-  {q:"做事风格是？",o:["慢工细活","随性自由","目标明确","稳扎稳打"],d:[5,7,6,4]},
-  {q:"面对压力你会？",o:["吃东西","找人倾诉","直接面对","逃避拖延"],d:[0,5,3,2]}
-];
-// 8种动物，图片路径全部写全，和你的png一一对应
-const map=[
-  {name:"水獭",tag:"治愈可爱 · 岁月静好",desc:"温暖治愈，懂得享受生活，手里有贝壳心里不慌。",dims:["治愈","安稳","可爱","细腻","满足"],vals:[90,85,80,75,88],img:"otter.png"},
-  {name:"赤狐",tag:"机灵聪慧 · 社交达人",desc:"聪明机警，八面玲珑，总能找到最优解。",dims:["机敏","社交","灵活","好奇","独立"],vals:[85,90,88,80,82],img:"fox.png"},
-  {name:"雪鸮",tag:"高冷智慧 · 洞察者",desc:"冷静睿智，洞察一切，自带神秘气场。",dims:["高冷","智慧","洞察","独立","静谧"],vals:[80,88,90,85,78],img:"owl.png"},
-  {name:"灰狼",tag:"傲娇酷飒 · 团队核心",desc:"桀骜不驯，忠诚果敢，团队中的领导者。",dims:["傲娇","忠诚","团队","果断","坚韧"],vals:[75,80,85,95,88],img:"wolf.png"},
-  {name:"陆龟",tag:"稳重踏实 · 长寿智者",desc:"稳重踏实，内心坚韧，岁月静好。",dims:["稳重","耐心","坚韧","平和","可靠"],vals:[70,75,80,85,95],img:"turtle.png"},
-  {name:"野兔",tag:"活泼灵动 · 小太阳",desc:"活泼可爱，心地善良，充满生机。",dims:["活泼","善良","灵动","敏感","快乐"],vals:[88,85,80,90,82],img:"rabbit.png"},
-  {name:"狮子",tag:"自信霸气 · 掌控一切",desc:"自信霸气，天生领袖，气场全开。",dims:["气场","领导","自信","热情","保护"],vals:[95,88,85,90,86],img:"lion.png"},
-  {name:"蝴蝶",tag:"自由美丽 · 蜕变",desc:"美丽自由，不断蜕变，灵魂轻盈。",dims:["自由","美丽","蜕变","灵动","浪漫"],vals:[85,95,88,80,90],img:"butterfly.png"}
-];
-let i=0,scores=[0,0,0,0,0,0,0,0];
-function next(){
-  document.getElementById("bar").style.width=((i/qs.length)*100)+"%";
-  if(i>=qs.length){showResult();return;}
-  const q=qs[i];
-  document.getElementById("qArea").innerHTML=`<div class="q-title">Q${i+1}. ${q.q}</div><div class="opts">${q.o.map((t,k)=>`<button class="opt" onclick="pick(${k})">${t}</button>`).join("")}</div>`;
-}
-function pick(k){scores[qs[i].d[k]]++;i++;next();}
-function showResult(){
-  document.getElementById("quiz").style.display="none";
-  let max=0,idx=0;for(let j=0;j<8;j++)if(scores[j]>max){max=scores[j];idx=j;}
-  if(max<=2 && scores[6]+scores[7]>max){idx=scores[6]>scores[7]?6:7;}
-  const r=map[idx];
-  document.getElementById("animalImg").src=r.img;
-  document.getElementById("animalImg").alt=r.name;
-  document.getElementById("rName").textContent=r.name;
-  document.getElementById("rTag").textContent=r.tag;
-  document.getElementById("rDesc").textContent=r.desc;
-  document.getElementById("dims").innerHTML=r.dims.map(d=>`<span class="dim">${d}</span>`).join("");
-  drawRadar(r);
-  document.getElementById("result").classList.add("show");
-  document.getElementById("bar").style.width="100%";
-}
-function drawRadar(r){
-  const c=document.getElementById("radar"),ctx=c.getContext("2d");
-  const cx=130,cy=130,rad=90,n=r.vals.length;
-  ctx.clearRect(0,0,260,260);
-  for(let g=1;g<=5;g++){ctx.beginPath();for(let j=0;j<n;j++){const a=Math.PI*2*j/n-Math.PI/2,rr=rad*g/5;ctx.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr);}ctx.closePath();ctx.strokeStyle="#E8E2D9";ctx.stroke();}
-  for(let j=0;j<n;j++){const a=Math.PI*2*j/n-Math.PI/2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*rad,cy+Math.sin(a)*rad);ctx.strokeStyle="#E8E2D9";ctx.stroke();}
-  ctx.beginPath();r.vals.forEach((v,j)=>{const a=Math.PI*2*j/n-Math.PI/2,rr=rad*v/100;ctx.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr);});ctx.closePath();ctx.fillStyle="rgba(212,154,106,0.35)";ctx.fill();ctx.strokeStyle="#D49A6A";ctx.lineWidth=2;ctx.stroke();
-  ctx.fillStyle="#666";ctx.font="11px sans-serif";
-  r.dims.forEach((d,j)=>{const a=Math.PI*2*j/n-Math.PI/2,lx=cx+Math.cos(a)*(rad+15),ly=cy+Math.sin(a)*(rad+15);ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(d,lx,ly);});
-}
-next();
+  let scores={A:0,B:0,C:0};
+  function showPage(id){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+  function ans(t){scores[t]++;next();}
+  function next(){
+    let cur=document.querySelector('.page.active').id;
+    let n=parseInt(cur.replace('q',''))+1;
+    if(n<=8)showPage('q'+n);else calc();
+  }
+  function calc(){
+    let r='otter';
+    if(scores.A>=5)r='turtle';
+    else if(scores.B>=5)r='lion';
+    else if(scores.A>=3&&scores.B>=2)r='wolf';
+    else if(scores.B>=3&&scores.C>=2)r='fox';
+    else if(scores.A>=2&&scores.C>=2&&scores.B<2)r='rabbit';
+    else if(scores.A>=2&&scores.B<2&&scores.C<3)r='snowy-owl';
+    else if(scores.C>=5)r='butterfly';
+    else r='otter';
+
+    let data={
+      turtle:{img:'./turtle.png',name:'乌龟',sub:'慢热·沉稳·长情观察者',desc:'你是隐藏款！像陆龟一样不急着表态，但每一步都踩得很实。社交里不是最活跃，但说话有分量。恋爱里慢热，需要时间确认安全感，一旦认定就极其长情。',match:'适配：兔子（你稳她甜）、狮子（被你稳住）'},
+      fox:{img:'./fox.png',name:'狐狸',sub:'机敏·社交·聪明灵活',desc:'你像狐狸，反应快、会来事，社交场上游刃有余。恋爱里需要新鲜感，但也护短，嘴硬心软，洞察力极强。',match:'适配：雪鸮（互相欣赏）、兔子（你逗她笑）'},
+      'snowy-owl':{img:'./snowy-owl.png',name:'雪鸮',sub:'高冷·神秘·洞察者',desc:'你像雪鸮，外表清冷疏离，内心敏锐通透。独处时最自在，看人极准，不轻易交心但极度忠诚，气质自带神秘感。',match:'适配：狐狸（势均力敌）、狼（懂你的冷）'},
+      wolf:{img:'./wolf.png',name:'狼',sub:'独立·野性·团队领袖',desc:'你像狼，独立有主见，既有独狼的酷，也有护群的担当。社交里不凑热闹，但关键时刻靠得住，恋爱里占有欲强但负责。',match:'适配：雪鸮（灵魂共鸣）、狮子（强强联合）'},
+      rabbit:{img:'./rabbit.png',name:'兔子',sub:'温柔·敏感·治愈系',desc:'你像兔子，温和可爱，内心敏感细腻。社交里随和，恋爱里需要被呵护，也能用柔软治愈对方，自带人见人爱属性。',match:'适配：乌龟（被稳稳接住）、水獭（快乐相伴）'},
+      lion:{img:'./lion.png',name:'狮子',sub:'霸气·主导·保护欲',desc:'你像狮子，目标明确，气场全开。社交里有领导力，恋爱里护短，占有欲强但给足安全感，是人群中的主心骨。',match:'适配：狼（互相成就）、兔子（反差萌）'},
+      butterfly:{img:'./butterfly.png',name:'蝴蝶',sub:'自由·多变·审美在线',desc:'你像蝴蝶，自由浪漫，审美绝佳。不喜欢被束缚，社交里灵动多变，恋爱里需要空间感，活出自己的色彩。',match:'适配：狐狸（有趣灵魂）、雪鸮（精神契合）'},
+      otter:{img:'./otter.png',name:'水獭',sub:'快乐·随性·治愈吃货',desc:'你像水獭，心态极好，随遇而安。社交里没架子，恋爱里好哄，日子过得轻松自在，是大家的快乐源泉。',match:'适配：兔子（甜度超标）、乌龟（被你带活泼）'}
+    };
+    let v=data[r];
+    document.getElementById('result-card').innerHTML=`
+      <div class="result-img"><img src="${v.img}" alt="${v.name}"></div>
+      <div class="result-title">${v.name}</div>
+      <div class="result-sub">${v.sub}</div>
+      <div class="result-desc">${v.desc}</div>
+      <div class="match">${v.match}</div>
+    `;
+    showPage('result');
+  }
 </script>
 </body>
 </html>
